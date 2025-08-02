@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AFFINITY - Téléchargez votre Ebook</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="bg-black">
+    <div class="max-w-md mx-auto p-8 md:p-12 bg-gray-900 rounded-xl shadow-lg border border-gray-700">
+        <div class="text-orange-500 text-6xl mb-4">🔥</div>
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">AFFINITY</h1>
+        <p class="text-lg md:text-xl text-gray-300 mb-6">
+            Découvrez comment AFFINITY révolutionne les connexions humaines.
+        </p>
+
+        <img src="https://placehold.co/400x250/111/FFF?text=Ebook+Cover" alt="Couverture de l'Ebook Affinity Story" class="rounded-lg shadow-md mb-8 mx-auto">
+
+        <h2 class="text-2xl md:text-3xl font-semibold text-white mb-4">
+            Téléchargez votre Ebook gratuit !
+        </h2>
+        <p class="text-gray-400 mb-6">
+            Laissez-nous votre e-mail pour recevoir le livre blanc "Affinity Story".
+        </p>
+
+        <form id="email-form" class="space-y-4">
+            <input type="email" id="email-input" name="email" required
+                   class="w-full p-4 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 border border-gray-700"
+                   placeholder="Votre e-mail">
+            <button type="submit" id="submit-button"
+                    class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-lg text-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                Télécharger maintenant
+            </button>
+        </form>
+
+        <div id="message-box" class="mt-4 p-4 text-center rounded-lg hidden"></div>
+    </div>
+
+    <script>
+        document.getElementById('email-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const emailInput = document.getElementById('email-input');
+            const submitButton = document.getElementById('submit-button');
+            const messageBox = document.getElementById('message-box');
+            const originalButtonText = submitButton.textContent;
+
+            submitButton.textContent = 'Envoi en cours...';
+            submitButton.disabled = true;
+            messageBox.classList.add('hidden');
+
+            try {
+                const response = await fetch('/api/submit-form', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: emailInput.value })
+                });
+
+                if (response.ok) {
+                    messageBox.textContent = 'E-mail enregistré avec succès ! Redirection...';
+                    messageBox.classList.remove('hidden');
+                    messageBox.classList.remove('bg-red-500');
+                    messageBox.classList.add('bg-green-500', 'text-white');
+                    setTimeout(() => {
+                        window.location.href = '/merci-ebook.html';
+                    }, 2000);
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Erreur inconnue');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la soumission du formulaire:', error);
+                messageBox.textContent = `Erreur: ${error.message}`;
+                messageBox.classList.remove('hidden');
+                messageBox.classList.remove('bg-green-500');
+                messageBox.classList.add('bg-red-500', 'text-white');
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
